@@ -296,7 +296,13 @@ export default function Home() {
                     </div>
                     
                     <div className="flex justify-end">
-                      <Button variant="outline" onClick={() => document.querySelector('button[aria-label="Close"]')?.click()}>
+                      <Button variant="outline" onClick={() => {
+                        // Chiudi il dialogo delle informazioni
+                        const infoDialog = document.querySelector('[role="dialog"] button[aria-label="Close"]');
+                        if (infoDialog) {
+                          infoDialog.click();
+                        }
+                      }}>
                         OK
                       </Button>
                     </div>
@@ -478,22 +484,29 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   {character.description && (
-                    <p className="text-sm text-gray-600 mb-4">{character.description}</p>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {character.description.length > 150 
+                        ? `${character.description.substring(0, 150)}...` 
+                        : character.description}
+                      {character.description.length > 150 && (
+                        <span className="text-purple-600 hover:text-purple-700 cursor-pointer ml-1">more</span>
+                      )}
+                    </p>
                   )}
                   
                   {character.images && character.images.length > 0 && (
                     <div className="mb-4">
                       <h4 className="text-sm font-medium text-gray-900 mb-2">Reference Sheet</h4>
                       <div className="grid grid-cols-2 gap-2">
-                        {character.images.slice(0, 4).map((image) => (
+                        {character.images.slice(0, 4).map((image, index) => (
                           <div key={image.id} className="relative group">
                             <img
                               src={image.filePath}
                               alt={`Reference for ${character.name}`}
                               className="w-full h-24 object-cover rounded border border-gray-300"
                             />
-                            {character.images.length > 4 && image.id === character.images[3].id && (
-                              <div className="absolute inset-0 bg-black bg-opacity-50 rounded border border-gray-300 flex items-center justify-center text-white text-sm">
+                            {character.images.length > 4 && index === 3 && (
+                              <div className="absolute inset-0 bg-black bg-opacity-70 rounded border border-gray-300 flex items-center justify-center text-white text-sm font-medium">
                                 +{character.images.length - 4}
                               </div>
                             )}
@@ -506,7 +519,7 @@ export default function Home() {
                   <div>
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Color Palette</h4>
                     <div className="grid grid-cols-4 gap-2">
-                      {character.colors.map((color) => (
+                      {character.colors.slice(0, 4).map((color) => (
                         <div key={color.id} className="text-center">
                           <div
                             className="w-full h-12 rounded border-2 border-gray-300 mb-1"
@@ -519,6 +532,16 @@ export default function Home() {
                           </div>
                         </div>
                       ))}
+                      {character.colors.length > 4 && (
+                        <div className="text-center">
+                          <div className="w-full h-12 rounded border-2 border-gray-300 mb-1 bg-gray-100 flex items-center justify-center">
+                            <span className="text-xs font-medium text-gray-600">+{character.colors.length - 4}</span>
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            <div>more</div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -617,8 +640,8 @@ export default function Home() {
               </Button>
             </Link>
             <div className="mt-4 pt-4 border-t border-gray-700">
-              <p className="text-xs text-gray-400">
-                © 2025 CharaRef. This is a fan-made project not affiliated with any animation studio or rights holder.
+              <p className="text-xs text-gray-400 mb-2">
+                © 2024 CharaRef. This is a fan-made project not affiliated with any animation studio or rights holder.
               </p>
               <p className="text-xs text-gray-500">
                 Anime icons created by Laura Reen - <a href="https://www.flaticon.com/free-icons/anime" title="anime icons" className="text-gray-400 hover:text-white transition-colors">Flaticon</a>
