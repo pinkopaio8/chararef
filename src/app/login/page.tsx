@@ -33,23 +33,23 @@ export default function LoginPage() {
         // Set authentication in localStorage
         localStorage.setItem('isModerator', 'true')
         toast({
-          title: "Accesso riuscito!",
-          description: "Benvenuto nella pagina di moderazione.",
+          title: "Login successful!",
+          description: "Welcome to the moderation page.",
           duration: 3000,
         })
         router.push('/moderation')
       } else {
         toast({
-          title: "Accesso negato",
-          description: "Password non valida. Riprova.",
+          title: "Access denied",
+          description: "Invalid password. Please try again.",
           variant: "destructive",
           duration: 3000,
         })
       }
     } catch (error) {
       toast({
-        title: "Errore",
-        description: "Impossibile verificare le credenziali. Riprova più tardi.",
+        title: "Error",
+        description: "Unable to verify credentials. Please try again later.",
         variant: "destructive",
         duration: 3000,
       })
@@ -65,8 +65,8 @@ export default function LoginPage() {
           <div className="flex justify-center mb-4">
             <Shield className="h-12 w-12 text-blue-600" />
           </div>
-          <CardTitle className="text-2xl">Accesso Moderatori</CardTitle>
-          <p className="text-gray-600">Inserisci la password per accedere alla pagina di moderazione</p>
+          <CardTitle className="text-2xl">Moderator Access</CardTitle>
+          <p className="text-gray-600">Enter the password to access the moderation page</p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,7 +101,7 @@ export default function LoginPage() {
               className="w-full bg-blue-600 hover:bg-blue-700"
               disabled={isLoading}
             >
-              {isLoading ? 'Verifica in corso...' : 'Accedi'}
+              {isLoading ? 'Verifying...' : 'Login'}
             </Button>
           </form>
           <div className="mt-6 text-center">
@@ -110,7 +110,7 @@ export default function LoginPage() {
               onClick={() => router.push('/')}
               className="w-full"
             >
-              Torna alla Home
+              Back to Home
             </Button>
           </div>
         </CardContent>

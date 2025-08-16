@@ -44,13 +44,13 @@ export function Sidebar({ characters, selectedAnime, onAnimeSelect, searchQuery,
         <CardHeader>
           <CardTitle className="flex items-center text-lg">
             <Hash className="h-5 w-5 mr-2" />
-            Cerca Personaggi
+            Search Characters
           </CardTitle>
         </CardHeader>
         <CardContent>
           <input
             type="text"
-            placeholder="Cerca per nome o anime..."
+            placeholder="Search by name or anime..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -73,7 +73,7 @@ export function Sidebar({ characters, selectedAnime, onAnimeSelect, searchQuery,
               className="w-full justify-start"
               onClick={() => onAnimeSelect(null)}
             >
-              Tutti gli Anime
+              All Anime
               <Badge variant="secondary" className="ml-auto">
                 {characters.length}
               </Badge>

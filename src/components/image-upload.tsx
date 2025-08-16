@@ -28,14 +28,14 @@ export function ImageUpload({ images, onImagesChange, maxImages = 5, maxSizeMB =
     // Check file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
     if (!allowedTypes.includes(file.type)) {
-      alert('Solo file PNG, JPEG e JPG sono permessi')
+      alert('Only PNG, JPEG, and JPG files are allowed')
       return false
     }
 
     // Check file size
     const maxSizeBytes = maxSizeMB * 1024 * 1024
     if (file.size > maxSizeBytes) {
-      alert(`La dimensione massima del file è ${maxSizeMB}MB`)
+      alert(`Maximum file size is ${maxSizeMB}MB`)
       return false
     }
 
@@ -46,7 +46,7 @@ export function ImageUpload({ images, onImagesChange, maxImages = 5, maxSizeMB =
     const validFiles = Array.from(files).filter(validateFile)
     
     if (images.length + validFiles.length > maxImages) {
-      alert(`Puoi caricare massimo ${maxImages} immagini`)
+      alert(`You can upload maximum ${maxImages} images`)
       return
     }
 
@@ -109,10 +109,10 @@ export function ImageUpload({ images, onImagesChange, maxImages = 5, maxSizeMB =
         <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <div className="space-y-2">
           <p className="text-lg font-medium text-gray-900">
-            Carica Reference Sheet
+            Upload Reference Sheet
           </p>
           <p className="text-sm text-gray-600">
-            Trascina qui le immagini o clicca per selezionare
+            Drag images here or click to select
           </p>
           <p className="text-xs text-gray-500">
             PNG, JPEG, JPG - Max {maxImages} immagini, max {maxSizeMB}MB ciascuna

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Palette, Shield } from 'lucide-react'
+import { Plus, Palette, Shield, FileText } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { ImageUpload } from '@/components/image-upload'
@@ -190,14 +190,14 @@ export default function Home() {
           images: []
         })
         toast({
-          title: "Personaggio inviato!",
-          description: "Il tuo personaggio è in attesa di approvazione da un moderatore.",
+          title: "Character submitted!",
+          description: "Your character is awaiting moderator approval.",
           duration: 5000,
         })
       } else {
         toast({
-          title: "Errore",
-          description: "Impossibile inviare il personaggio. Riprova più tardi.",
+          title: "Error",
+          description: "Unable to submit character. Please try again later.",
           variant: "destructive",
           duration: 5000,
         })
@@ -205,8 +205,8 @@ export default function Home() {
     } catch (error) {
       console.error('Error submitting character:', error)
       toast({
-        title: "Errore",
-        description: "Impossibile caricare le immagini. Riprova più tardi.",
+        title: "Error",
+        description: "Unable to upload images. Please try again later.",
         variant: "destructive",
         duration: 5000,
       })
@@ -236,7 +236,7 @@ export default function Home() {
               <Link href="/login">
                 <Button variant="outline" size="sm">
                   <Shield className="h-4 w-4 mr-2" />
-                  Area Moderatori
+                  Moderator Area
                 </Button>
               </Link>
               <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
@@ -373,9 +373,9 @@ export default function Home() {
               {(selectedAnime || searchQuery) && (
                 <div className="mt-4">
                   <p className="text-sm text-gray-500">
-                    Mostrando {characters.length} personaggio{characters.length !== 1 ? 'i' : ''}
+                    Showing {characters.length} character{characters.length !== 1 ? 's' : ''}
                     {selectedAnime && ` in "${selectedAnime}"`}
-                    {searchQuery && ` per "${searchQuery}"`}
+                    {searchQuery && ` for "${searchQuery}"`}
                   </p>
                   <Button
                     variant="link"
@@ -385,7 +385,7 @@ export default function Home() {
                     }}
                     className="text-purple-600"
                   >
-                    Cancella filtri
+                    Clear filters
                   </Button>
                 </div>
               )}
@@ -395,11 +395,11 @@ export default function Home() {
               <div className="text-center py-12">
                 <Palette className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {searchQuery || selectedAnime ? 'Nessun personaggio trovato' : 'No characters yet'}
+                  {searchQuery || selectedAnime ? 'No characters found' : 'No characters yet'}
                 </h3>
                 <p className="text-gray-600 mb-4">
                   {searchQuery || selectedAnime 
-                    ? 'Prova a modificare i filtri di ricerca.'
+                    ? 'Try adjusting your search filters.'
                     : 'Be the first to upload a character!'
                   }
                 </p>
@@ -468,40 +468,17 @@ export default function Home() {
 
       {/* Terms of Service Footer */}
       <footer className="bg-gray-900 text-white mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <h3 className="text-lg font-semibold mb-4">Termini di Servizio e Note Legali</h3>
-            <div className="max-w-4xl mx-auto text-sm text-gray-300 space-y-4 text-left">
-              <p>
-                <strong>Diritti d'Autore e Copyright:</strong> Tutti i personaggi anime, immagini e contenuti 
-                visualizzati su questo sito sono di proprietà dei rispettivi autori e detentori dei diritti d'autore. 
-                CharaRef non rivendica la proprietà di alcun materiale protetto da copyright.
-              </p>
-              <p>
-                <strong>Uso Personale e Non Commerciale:</strong> Questo sito è stato creato esclusivamente per scopi 
-                personali, educativi e di riferimento. Tutti i contenuti sono forniti "così come sono" senza alcuna 
-                garanzia. CharaRef è un progetto non a scopo di lucro e non genera alcun tipo di reddito.
-              </p>
-              <p>
-                <strong>Fair Use:</strong> L'utilizzo di immagini e materiale protetto da copyright su questo sito 
-                avviene secondo i principi di "fair use" (uso leale) come previsto dalla legislazione sul copyright. 
-                Le immagini sono utilizzate a scopo di riferimento, critica, commento e ricerca, senza intaccare il 
-                mercato potenziale dell'opera originale.
-              </p>
-              <p>
-                <strong>Responsabilità dell'Utente:</strong> Gli utenti sono responsabili per il materiale che caricano. 
-                Caricando contenuti su CharaRef, gli utenti dichiarano di avere i diritti necessari per condividere 
-                tali materiali o che il loro utilizzo rientra nelle eccezioni di fair use.
-              </p>
-              <p>
-                <strong>Rimozione Contenuti:</strong> Se sei un detentore dei diritti d'autore e ritieni che il tuo 
-                materiale sia stato utilizzato in modo improprio, ti preghiamo di contattarci per la rimozione immediata 
-                del contenuto.
-              </p>
-            </div>
-            <div className="mt-8 pt-8 border-t border-gray-700">
+            <Link href="/terms-of-service">
+              <Button variant="outline" className="text-white border-white hover:bg-white hover:text-gray-900">
+                <FileText className="h-4 w-4 mr-2" />
+                Terms of Service and Legal Notices
+              </Button>
+            </Link>
+            <div className="mt-4 pt-4 border-t border-gray-700">
               <p className="text-xs text-gray-400">
-                © 2024 CharaRef. Questo è un progetto fan-made non affiliato con alcuno studio di animazione o detentore dei diritti.
+                © 2024 CharaRef. This is a fan-made project not affiliated with any animation studio or rights holder.
               </p>
             </div>
           </div>
