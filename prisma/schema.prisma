@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model AnimeCharacter {
+  id          String   @id @default(cuid())
+  name        String
+  anime       String
+  description String?
+  status      CharacterStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  colors      CharacterColor[]
+  images      CharacterImage[]
+  
+  @@map("anime_characters")
+}
+
+model CharacterColor {
+  id         String  @id @default(cuid())
+  name       String?
+  hex        String
+  rgb        String
+  characterId String
+  
+  character  AnimeCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  
+  @@map("character_colors")
+}
+
+model CharacterImage {
+  id         String  @id @default(cuid())
+  filename   String
+  originalName String
+  filePath   String
+  fileSize   Int
+  mimeType   String
+  characterId String
+  
+  character  AnimeCharacter @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  
+  @@map("character_images")
+}
+
+enum CharacterStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
