@@ -5,7 +5,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Check, X, Eye, Shield, Home, LogOut, Trash, Edit } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Check, X, Eye, Shield, Home, LogOut, Trash, Edit, Save, Plus } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { useModeratorAuth } from '@/hooks/use-moderator-auth'
@@ -42,6 +45,7 @@ export default function ModerationPage() {
   const [pendingCharacters, setPendingCharacters] = useState<AnimeCharacter[]>([])
   const [approvedCharacters, setApprovedCharacters] = useState<AnimeCharacter[]>([])
   const [selectedCharacter, setSelectedCharacter] = useState<AnimeCharacter | null>(null)
+  const [editingCharacter, setEditingCharacter] = useState<AnimeCharacter | null>(null)
   const [charactersLoading, setCharactersLoading] = useState(true)
   const { toast } = useToast()
 
@@ -177,6 +181,73 @@ export default function ModerationPage() {
     }
   }
 
+  const handleEdit = (character: AnimeCharacter) => {
+    setEditingCharacter(character)
+    setSelectedCharacter(null)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingCharacter) return
+
+    try {
+      const response = await fetch(`/api/characters/${editingCharacter.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: editingCharacter.name,
+          anime: editingCharacter.anime,
+          description: editingCharacter.description,
+          colors: editingCharacter.colors,
+          images: editingCharacter.images,
+          status: 'PENDING'
+        }),
+      })
+
+      if (response.ok) {
+        await fetchAllCharacters()
+        setEditingCharacter(null)
+        toast({
+          title: "Character updated",
+          description: "The character has been successfully updated.",
+          duration: 3000,
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: "Unable to update character.",
+          variant: "destructive",
+          duration: 3000,
+        })
+      }
+    } catch (error) {
+      console.error('Error updating character:', error)
+      toast({
+        title: "Error",
+        description: "Unable to update character.",
+        variant: "destructive",
+        duration: 3000,
+      })
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setEditingCharacter(null)
+  }
+
+  const updateCharacterField = (field: string, value: any) => {
+    if (!editingCharacter) return
+    setEditingCharacter({ ...editingCharacter, [field]: value })
+  }
+
+  const updateColorField = (colorIndex: number, field: string, value: string) => {
+    if (!editingCharacter) return
+    const newColors = [...editingCharacter.colors]
+    newColors[colorIndex] = { ...newColors[colorIndex], [field]: value }
+    setEditingCharacter({ ...editingCharacter, colors: newColors })
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       day: '2-digit',
@@ -300,11 +371,28 @@ export default function ModerationPage() {
                               <div className="grid grid-cols-2 gap-4">
                                 {character.images.map((image) => (
                                   <div key={image.id} className="text-center">
-                                    <img
-                                      src={image.filePath}
-                                      alt={`Reference for ${character.name}`}
-                                      className="w-full h-32 object-cover rounded-lg border-2 border-gray-300 mb-2"
-                                    />
+                                    <Dialog>
+                                      <DialogTrigger asChild>
+                                        <img
+                                          src={image.filePath}
+                                          alt={`Reference for ${character.name}`}
+                                          className="w-full h-32 object-cover rounded-lg border-2 border-gray-300 mb-2 cursor-pointer hover:shadow-lg transition-shadow"
+                                        />
+                                      </DialogTrigger>
+                                      <DialogContent className="max-w-4xl">
+                                        <DialogHeader>
+                                          <DialogTitle>{character.name} - Reference Sheet</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="text-center">
+                                          <img
+                                            src={image.filePath}
+                                            alt={`Reference for ${character.name}`}
+                                            className="max-w-full max-h-96 object-contain rounded-lg border-2 border-gray-300"
+                                          />
+                                          <p className="text-sm text-gray-500 mt-2">{image.originalName}</p>
+                                        </div>
+                                      </DialogContent>
+                                    </Dialog>
                                     <p className="text-xs text-gray-500 truncate">{image.originalName}</p>
                                   </div>
                                 ))}
@@ -351,6 +439,13 @@ export default function ModerationPage() {
                       </DialogContent>
                     </Dialog>
                     
+                    <Button
+                      onClick={() => handleEdit(character)}
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
                     <Button
                       onClick={() => handleApprove(character.id)}
                       size="sm"
@@ -446,11 +541,28 @@ export default function ModerationPage() {
                                 <div className="grid grid-cols-2 gap-4">
                                   {character.images.map((image) => (
                                     <div key={image.id} className="text-center">
-                                      <img
-                                        src={image.filePath}
-                                        alt={`Reference for ${character.name}`}
-                                        className="w-full h-32 object-cover rounded-lg border-2 border-gray-300 mb-2"
-                                      />
+                                      <Dialog>
+                                        <DialogTrigger asChild>
+                                          <img
+                                            src={image.filePath}
+                                            alt={`Reference for ${character.name}`}
+                                            className="w-full h-32 object-cover rounded-lg border-2 border-gray-300 mb-2 cursor-pointer hover:shadow-lg transition-shadow"
+                                          />
+                                        </DialogTrigger>
+                                        <DialogContent className="max-w-4xl">
+                                          <DialogHeader>
+                                            <DialogTitle>{character.name} - Reference Sheet</DialogTitle>
+                                          </DialogHeader>
+                                          <div className="text-center">
+                                            <img
+                                              src={image.filePath}
+                                              alt={`Reference for ${character.name}`}
+                                              className="max-w-full max-h-96 object-contain rounded-lg border-2 border-gray-300"
+                                            />
+                                            <p className="text-sm text-gray-500 mt-2">{image.originalName}</p>
+                                          </div>
+                                        </DialogContent>
+                                      </Dialog>
                                       <p className="text-xs text-gray-500 truncate">{image.originalName}</p>
                                     </div>
                                   ))}
@@ -495,6 +607,122 @@ export default function ModerationPage() {
           )}
         </div>
       </main>
+
+      {/* Edit Character Dialog */}
+      <Dialog open={!!editingCharacter} onOpenChange={() => setEditingCharacter(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Edit className="h-5 w-5" />
+              <span>Edit Character - {editingCharacter?.name}</span>
+            </DialogTitle>
+          </DialogHeader>
+          {editingCharacter && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Character Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="edit-name">Character Name</Label>
+                    <Input
+                      id="edit-name"
+                      value={editingCharacter.name}
+                      onChange={(e) => updateCharacterField('name', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-anime">Anime</Label>
+                    <Input
+                      id="edit-anime"
+                      value={editingCharacter.anime}
+                      onChange={(e) => updateCharacterField('anime', e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="edit-description">Description (Optional)</Label>
+                  <Textarea
+                    id="edit-description"
+                    value={editingCharacter.description || ''}
+                    onChange={(e) => updateCharacterField('description', e.target.value)}
+                    rows={3}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Color Palette</h3>
+                <div className="space-y-4">
+                  {editingCharacter.colors.map((color, index) => (
+                    <div key={color.id} className="flex items-center space-x-4 p-4 border rounded-lg">
+                      <div
+                        className="w-12 h-12 rounded border-2 border-gray-300"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <Input
+                          placeholder="Color name (optional)"
+                          value={color.name || ''}
+                          onChange={(e) => updateColorField(index, 'name', e.target.value)}
+                        />
+                        <Input
+                          type="color"
+                          value={color.hex}
+                          onChange={(e) => updateColorField(index, 'hex', e.target.value)}
+                        />
+                        <div className="flex items-center space-x-2">
+                          <Input
+                            value={color.hex}
+                            onChange={(e) => updateColorField(index, 'hex', e.target.value)}
+                            className="text-xs"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newColors = editingCharacter.colors.filter((_, i) => i !== index)
+                              updateCharacterField('colors', newColors)
+                            }}
+                            disabled={editingCharacter.colors.length === 1}
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const newColors = [...editingCharacter.colors, { name: '', hex: '#000000', rgb: 'rgb(0, 0, 0)' }]
+                      updateCharacterField('colors', newColors)
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Color
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={handleCancelEdit}>
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveEdit} className="bg-green-600 hover:bg-green-700">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Palette, Shield, FileText, Eye } from 'lucide-react'
+import { Plus, Palette, Shield, FileText, Eye, Info } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { ImageUpload } from '@/components/image-upload'
@@ -240,6 +240,69 @@ export default function Home() {
                   Moderator Area
                 </Button>
               </Link>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Info className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center space-x-2">
+                      <Info className="h-5 w-5" />
+                      <span>About CharaRef</span>
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">What is CharaRef?</h3>
+                      <p className="text-gray-600">
+                        CharaRef is a fan-made anime character reference website where users can upload and share color palettes from their favorite anime characters. The site provides a comprehensive database of character colors and reference sheets for artists, cosplayers, and anime enthusiasts.
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">Features</h3>
+                      <ul className="list-disc list-inside text-gray-600">
+                        <li>Upload characters with custom color palettes</li>
+                        <li>Share reference sheets and images</li>
+                        <li>Browse approved characters by anime series</li>
+                        <li>Search and filter characters</li>
+                        <li>View detailed character information</li>
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">Rules</h3>
+                      <ul className="list-disc list-inside text-gray-600">
+                        <li>Only upload characters you have permission to share</li>
+                        <li>Keep content appropriate and respectful</li>
+                        <li>Provide accurate information about characters</li>
+                        <li>Upload high-quality images and accurate colors</li>
+                        <li>Be patient with the moderation process</li>
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">How to Use</h3>
+                      <ol className="list-decimal list-inside text-gray-600">
+                        <li>Click "Upload Character" to add new characters</li>
+                        <li>Fill in character details and add colors</li>
+                        <li>Upload reference images</li>
+                        <li>Submit for moderation</li>
+                        <li>Wait for approval</li>
+                        <li>Enjoy browsing the character database</li>
+                      </ol>
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      <Button variant="outline" onClick={() => document.querySelector('button[aria-label="Close"]')?.click()}>
+                        OK
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
               <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-purple-600 hover:bg-purple-700">
@@ -491,11 +554,28 @@ export default function Home() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {selectedCharacter.images.map((image) => (
                       <div key={image.id} className="text-center">
-                        <img
-                          src={image.filePath}
-                          alt={`Reference for ${selectedCharacter.name}`}
-                          className="w-full h-64 object-cover rounded-lg border-2 border-gray-300 mb-2"
-                        />
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <img
+                              src={image.filePath}
+                              alt={`Reference for ${selectedCharacter.name}`}
+                              className="w-full h-64 object-cover rounded-lg border-2 border-gray-300 mb-2 cursor-pointer hover:shadow-lg transition-shadow"
+                            />
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl">
+                            <DialogHeader>
+                              <DialogTitle>{selectedCharacter.name} - Reference Sheet</DialogTitle>
+                            </DialogHeader>
+                            <div className="text-center">
+                              <img
+                                src={image.filePath}
+                                alt={`Reference for ${selectedCharacter.name}`}
+                                className="max-w-full max-h-96 object-contain rounded-lg border-2 border-gray-300"
+                              />
+                              <p className="text-sm text-gray-500 mt-2">{image.originalName}</p>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                         <p className="text-sm text-gray-500 truncate">{image.originalName}</p>
                       </div>
                     ))}
