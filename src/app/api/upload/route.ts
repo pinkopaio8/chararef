@@ -1,13 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile } from 'fs/promises'
-import { join } from 'path'
-import { existsSync, mkdirSync } from 'fs'
-
-// Create uploads directory if it doesn't exist
-const uploadsDir = join(process.cwd(), 'public', 'uploads')
-if (!existsSync(uploadsDir)) {
-  mkdirSync(uploadsDir, { recursive: true })
-}
+import { put } from '@vercel/blob'
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,17 +39,16 @@ export async function POST(request: NextRequest) {
       const randomId = Math.random().toString(36).substring(2, 15)
       const extension = file.name.split('.').pop()
       const filename = `${timestamp}-${randomId}.${extension}`
-      const filePath = join(uploadsDir, filename)
 
-      // Write file to disk
-      const bytes = await file.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      await writeFile(filePath, buffer)
+      // Upload to Vercel Blob
+      const blob = await put(filename, file, {
+        access: 'public',
+      })
 
       uploadedFiles.push({
-        filename,
+        filename: blob.pathname,
         originalName: file.name,
-        filePath: `/uploads/${filename}`,
+        filePath: blob.url,
         fileSize: file.size,
         mimeType: file.type
       })
