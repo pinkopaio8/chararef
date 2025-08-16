@@ -315,7 +315,7 @@ export default function ModerationPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {pendingCharacters.map((character) => (
-              <Card key={character.id} className="hover:shadow-lg transition-shadow">
+              <Card key={character.id} className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardHeader>
                   <CardTitle className="text-lg">{character.name}</CardTitle>
                   <Badge variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200">
@@ -356,7 +356,7 @@ export default function ModerationPage() {
                           Preview
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-2xl">
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
                           <DialogTitle>{character.name} - {character.anime}</DialogTitle>
                         </DialogHeader>
@@ -485,7 +485,7 @@ export default function ModerationPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {approvedCharacters.map((character) => (
-                <Card key={character.id} className="hover:shadow-lg transition-shadow">
+                <Card key={character.id} className="hover:shadow-lg transition-shadow cursor-pointer">
                   <CardHeader>
                     <CardTitle className="text-lg">{character.name}</CardTitle>
                     <Badge variant="outline" className="bg-green-50 text-green-800 border-green-200">
@@ -526,7 +526,7 @@ export default function ModerationPage() {
                             View
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>{character.name} - {character.anime}</DialogTitle>
                           </DialogHeader>
