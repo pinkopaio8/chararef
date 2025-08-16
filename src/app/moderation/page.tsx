@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Check, X, Eye, Shield, Home, LogOut } from 'lucide-react'
+import { Check, X, Eye, Shield, Home, LogOut, Trash, Edit } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { useModeratorAuth } from '@/hooks/use-moderator-auth'
@@ -40,25 +40,27 @@ interface AnimeCharacter {
 export default function ModerationPage() {
   const { isAuthenticated, isLoading, logout } = useModeratorAuth()
   const [pendingCharacters, setPendingCharacters] = useState<AnimeCharacter[]>([])
+  const [approvedCharacters, setApprovedCharacters] = useState<AnimeCharacter[]>([])
   const [selectedCharacter, setSelectedCharacter] = useState<AnimeCharacter | null>(null)
   const [charactersLoading, setCharactersLoading] = useState(true)
   const { toast } = useToast()
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchPendingCharacters()
+      fetchAllCharacters()
     }
   }, [isAuthenticated])
 
-  const fetchPendingCharacters = async () => {
+  const fetchAllCharacters = async () => {
     try {
       const response = await fetch('/api/characters')
       if (response.ok) {
         const data = await response.json()
         setPendingCharacters(data.filter((char: AnimeCharacter) => char.status === 'PENDING'))
+        setApprovedCharacters(data.filter((char: AnimeCharacter) => char.status === 'APPROVED'))
       }
     } catch (error) {
-      console.error('Error fetching pending characters:', error)
+      console.error('Error fetching characters:', error)
     } finally {
       setCharactersLoading(false)
     }
@@ -75,7 +77,7 @@ export default function ModerationPage() {
       })
 
       if (response.ok) {
-        await fetchPendingCharacters()
+        await fetchAllCharacters()
         setSelectedCharacter(null)
         toast({
           title: "Character approved!",
@@ -112,7 +114,7 @@ export default function ModerationPage() {
       })
 
       if (response.ok) {
-        await fetchPendingCharacters()
+        await fetchAllCharacters()
         setSelectedCharacter(null)
         toast({
           title: "Character rejected",
@@ -132,6 +134,43 @@ export default function ModerationPage() {
       toast({
         title: "Errore",
         description: "Impossibile rifiutare il personaggio.",
+        variant: "destructive",
+        duration: 3000,
+      })
+    }
+  }
+
+  const handleDelete = async (characterId: string) => {
+    if (!confirm('Are you sure you want to delete this character? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/characters/${characterId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        await fetchAllCharacters()
+        setSelectedCharacter(null)
+        toast({
+          title: "Character deleted",
+          description: "The character has been permanently deleted.",
+          duration: 3000,
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: "Unable to delete character.",
+          variant: "destructive",
+          duration: 3000,
+        })
+      }
+    } catch (error) {
+      console.error('Error deleting character:', error)
+      toast({
+        title: "Error",
+        description: "Unable to delete character.",
         variant: "destructive",
         duration: 3000,
       })
@@ -332,6 +371,129 @@ export default function ModerationPage() {
             ))}
           </div>
         )}
+        
+        {/* Approved Characters Section */}
+        <div className="mt-16">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Approved Characters</h2>
+            <p className="text-gray-600">
+              {approvedCharacters.length} approved characters
+            </p>
+          </div>
+
+          {approvedCharacters.length === 0 ? (
+            <div className="text-center py-12">
+              <Shield className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No approved characters yet</h3>
+              <p className="text-gray-600">Approved characters will appear here.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {approvedCharacters.map((character) => (
+                <Card key={character.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle className="text-lg">{character.name}</CardTitle>
+                    <Badge variant="outline" className="bg-green-50 text-green-800 border-green-200">
+                      Approved
+                    </Badge>
+                    <p className="text-sm text-gray-500">{formatDate(character.createdAt)}</p>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm font-medium text-gray-900 mb-1">Anime: {character.anime}</p>
+                    {character.description && (
+                      <p className="text-sm text-gray-600 mb-4">{character.description}</p>
+                    )}
+                    
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-2">Colors ({character.colors.length})</h4>
+                      <div className="grid grid-cols-4 gap-1">
+                        {character.colors.slice(0, 8).map((color) => (
+                          <div
+                            key={color.id}
+                            className="w-full h-8 rounded border border-gray-300"
+                            style={{ backgroundColor: color.hex }}
+                            title={color.name || color.hex}
+                          />
+                        ))}
+                        {character.colors.length > 8 && (
+                          <div className="w-full h-8 rounded border border-gray-300 bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+                            +{character.colors.length - 8}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="flex-1">
+                            <Eye className="h-4 w-4 mr-1" />
+                            View
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>{character.name} - {character.anime}</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            {character.description && (
+                              <p className="text-gray-600">{character.description}</p>
+                            )}
+                            
+                            {character.images && character.images.length > 0 && (
+                              <div>
+                                <h4 className="font-medium mb-2">Reference Sheet</h4>
+                                <div className="grid grid-cols-2 gap-4">
+                                  {character.images.map((image) => (
+                                    <div key={image.id} className="text-center">
+                                      <img
+                                        src={image.filePath}
+                                        alt={`Reference for ${character.name}`}
+                                        className="w-full h-32 object-cover rounded-lg border-2 border-gray-300 mb-2"
+                                      />
+                                      <p className="text-xs text-gray-500 truncate">{image.originalName}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            <div>
+                              <h4 className="font-medium mb-2">Color Palette</h4>
+                              <div className="grid grid-cols-4 gap-4">
+                                {character.colors.map((color) => (
+                                  <div key={color.id} className="text-center">
+                                    <div
+                                      className="w-full h-16 rounded-lg border-2 border-gray-300 mb-2"
+                                      style={{ backgroundColor: color.hex }}
+                                    />
+                                    <div className="text-xs text-gray-600">
+                                      <div className="font-medium">{color.name || 'Unnamed'}</div>
+                                      <div>{color.hex}</div>
+                                      <div className="text-gray-500">{color.rgb}</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      
+                      <Button
+                        onClick={() => handleDelete(character.id)}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </main>
     </div>
   )

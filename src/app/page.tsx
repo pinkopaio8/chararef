@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Plus, Palette, Shield, FileText } from 'lucide-react'
+import { Plus, Palette, Shield, FileText, Eye } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import { ImageUpload } from '@/components/image-upload'
@@ -44,6 +44,7 @@ export default function Home() {
   const [allCharacters, setAllCharacters] = useState<AnimeCharacter[]>([])
   const [characters, setCharacters] = useState<AnimeCharacter[]>([])
   const [isUploadOpen, setIsUploadOpen] = useState(false)
+  const [selectedCharacter, setSelectedCharacter] = useState<AnimeCharacter | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedAnime, setSelectedAnime] = useState<string | null>(null)
@@ -318,7 +319,7 @@ export default function Home() {
                               <div className="flex items-center space-x-2">
                                 <Input
                                   value={color.hex}
-                                  readOnly
+                                  onChange={(e) => handleColorChange(index, 'hex', e.target.value)}
                                   className="text-xs"
                                 />
                                 <Button
@@ -407,7 +408,7 @@ export default function Home() {
             ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {characters.map((character) => (
-              <Card key={character.id} className="hover:shadow-lg transition-shadow">
+              <Card key={character.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setSelectedCharacter(character)}>
                 <CardHeader>
                   <CardTitle className="text-lg">{character.name}</CardTitle>
                   <Badge variant="secondary">{character.anime}</Badge>
@@ -466,12 +467,71 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Character Detail Dialog */}
+      <Dialog open={!!selectedCharacter} onOpenChange={() => setSelectedCharacter(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Eye className="h-5 w-5" />
+              <span>{selectedCharacter?.name} - {selectedCharacter?.anime}</span>
+            </DialogTitle>
+          </DialogHeader>
+          {selectedCharacter && (
+            <div className="space-y-6">
+              {selectedCharacter.description && (
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Description</h3>
+                  <p className="text-gray-600">{selectedCharacter.description}</p>
+                </div>
+              )}
+              
+              {selectedCharacter.images && selectedCharacter.images.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Reference Sheet</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {selectedCharacter.images.map((image) => (
+                      <div key={image.id} className="text-center">
+                        <img
+                          src={image.filePath}
+                          alt={`Reference for ${selectedCharacter.name}`}
+                          className="w-full h-64 object-cover rounded-lg border-2 border-gray-300 mb-2"
+                        />
+                        <p className="text-sm text-gray-500 truncate">{image.originalName}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Color Palette</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {selectedCharacter.colors.map((color) => (
+                    <div key={color.id} className="text-center">
+                      <div
+                        className="w-full h-20 rounded-lg border-2 border-gray-300 mb-2"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <div className="text-sm text-gray-600">
+                        <div className="font-medium">{color.name || 'Unnamed'}</div>
+                        <div>{color.hex}</div>
+                        <div className="text-xs text-gray-500">{color.rgb}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Terms of Service Footer */}
       <footer className="bg-gray-900 text-white mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <Link href="/terms-of-service">
-              <Button variant="outline" className="text-white border-white hover:bg-white hover:text-gray-900">
+              <Button variant="outline" className="text-black border-gray-300 hover:bg-white hover:text-gray-900">
                 <FileText className="h-4 w-4 mr-2" />
                 Terms of Service and Legal Notices
               </Button>
