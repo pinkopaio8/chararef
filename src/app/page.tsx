@@ -618,7 +618,10 @@ export default function Home() {
             </Link>
             <div className="mt-4 pt-4 border-t border-gray-700">
               <p className="text-xs text-gray-400">
-                © 2024 CharaRef. This is a fan-made project not affiliated with any animation studio or rights holder.
+                © 2025 CharaRef. This is a fan-made project not affiliated with any animation studio or rights holder.
+              </p>
+              <p className="text-xs text-gray-500">
+                Anime icons created by Laura Reen - <a href="https://www.flaticon.com/free-icons/anime" title="anime icons" className="text-gray-400 hover:text-white transition-colors">Flaticon</a>
               </p>
             </div>
           </div>
