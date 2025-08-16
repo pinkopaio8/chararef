@@ -40,9 +40,10 @@ export async function POST(request: NextRequest) {
       const extension = file.name.split('.').pop()
       const filename = `${timestamp}-${randomId}.${extension}`
 
-      // Upload to Vercel Blob
+      // Upload to Vercel Blob using the correct token name
       const blob = await put(filename, file, {
         access: 'public',
+        token: process.env.WAIFU_READ_WRITE_TOKEN,
       })
 
       uploadedFiles.push({
