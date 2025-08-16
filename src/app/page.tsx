@@ -231,7 +231,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Palette className="h-8 w-8 text-purple-600" />
-              <h1 className="text-2xl font-bold text-gray-900">CharaRef</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">CharaRef</h1>
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/login">
@@ -306,8 +306,8 @@ export default function Home() {
               <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-purple-600 hover:bg-purple-700">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Upload Character
+                    <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Upload Character</span>
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -315,7 +315,7 @@ export default function Home() {
                     <DialogTitle>Upload New Character</DialogTitle>
                   </DialogHeader>
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="name">Character Name</Label>
                         <Input
@@ -363,12 +363,12 @@ export default function Home() {
                       </div>
                       <div className="space-y-4">
                         {formData.colors.map((color, index) => (
-                          <div key={index} className="flex items-center space-x-4 p-4 border rounded-lg">
+                          <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-4 border rounded-lg">
                             <div
                               className="w-12 h-12 rounded border-2 border-gray-300"
                               style={{ backgroundColor: color.hex }}
                             />
-                            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
                               <Input
                                 placeholder="Color name (optional)"
                                 value={color.name}
@@ -400,7 +400,7 @@ export default function Home() {
                         ))}
                       </div>
                     </div>
-                    <div className="flex justify-end space-x-2">
+                    <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
                       <Button type="button" variant="outline" onClick={() => setIsUploadOpen(false)} disabled={isUploading}>
                         Cancel
                       </Button>
@@ -432,8 +432,8 @@ export default function Home() {
           {/* Main Content */}
           <div className="flex-1">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Anime Character Reference</h2>
-              <p className="text-gray-600">Discover and share color palettes from your favorite anime characters</p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Anime Character Reference</h2>
+              <p className="text-gray-600 text-sm sm:text-base">Discover and share color palettes from your favorite anime characters</p>
               {(selectedAnime || searchQuery) && (
                 <div className="mt-4">
                   <p className="text-sm text-gray-500">
@@ -469,11 +469,11 @@ export default function Home() {
                 </p>
               </div>
             ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {characters.map((character) => (
               <Card key={character.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setSelectedCharacter(character)}>
                 <CardHeader>
-                  <CardTitle className="text-lg">{character.name}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">{character.name}</CardTitle>
                   <Badge variant="secondary">{character.anime}</Badge>
                 </CardHeader>
                 <CardContent>
